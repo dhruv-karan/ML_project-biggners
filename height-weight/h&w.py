@@ -17,9 +17,13 @@ dataset.describe()
 X = dataset.iloc[:,1:3].values
 y = dataset.iloc[:,0:1].values
 
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder,OneHotEncoder
 labelencoder = LabelEncoder()
 y[:, 0] = labelencoder.fit_transform(y[:, 0])
+onehotencoder = OneHotEncoder(categorical_features = [0])
+y = onehotencoder.fit_transform(y).toarray()
+# Avoiding the Dummy Variable Trap
+y = y[:, 1:]
 
 #making traing and test set
 from sklearn.cross_validation import train_test_split
@@ -35,10 +39,11 @@ regressor.fit(X_train, y_train)
 
 y_pred = regressor.predict(X_test)
 y_pred  = y_pred>0.5
-j=0
-for i in y_pred:
-    if(i==True):
-        y_pred[j] = 1
-        j =j+1
-    y_pred[j]=0
-    j = j+1
+from sklearn.metrics import confusion_matrix
+cm = confusion_matrix(y_test, y_pred)
+
+# this model workd with 93% accuracey
+# tommorow we will preform another method over it so that we can increase accuracye
+
+
+
