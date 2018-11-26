@@ -12,8 +12,8 @@ dataset1= pd.read_csv('test.csv',low_memory=False)
 dataset.head().transpose
 dataset.shape
 corpus = []
-corpus.append(dataset.dtypes)
-corpus.append(dataset.isnull().sum())
+corpus.append(dataset1.dtypes)
+corpus.append(dataset1.isnull().sum())
 
 
 dataset.dtypes[4]
@@ -41,16 +41,32 @@ X_train = X_train
 X_test = X_test.drop(['Alley', 'MasVnrType','BsmtQual','BsmtCond','FireplaceQu','PoolQC','BsmtExposure','BsmtFinType1','BsmtFinType2','Electrical','GarageType','GarageFinish','GarageQual','GarageCond','Fence','MiscFeature'],axis=1)
 X_test = X_test
 
-op= X_train.isnull().sum()
+
+mylist = list(X_test.select_dtypes(include=['object']).columns)
+
+#mylist_float = list(X_test.select_dtypes(include=['float64']).columns)
+
+
+
 no =[]
 jp =X_test.isnull().sum()
-
+jp[2]
+k =-1
+for i in jp:
+    k+=1
+    if(jp[k]>0):
+        no.append(i)
 
 
 from sklearn.preprocessing import Imputer
 imputer = Imputer(missing_values="NaN",strategy="mean",axis=0)
 imputer = imputer.fit(X_train[:, [3,24,49]])
 X_train[:, [3,24,49]] = imputer.transform(X_train[:,[3,24,49]])
+
+
+
+
+
 
 from sklearn.preprocessing import Imputer
 imputer1 = Imputer(missing_values="NaN",strategy="mean",axis=0)
