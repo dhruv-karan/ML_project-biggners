@@ -30,22 +30,20 @@ bag_sentence = []
 for file in full_data:
         sentence = nltk.sent_tokenize(file)
         bag_sentence.append(sentence)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+j=0
+i =0
+for j in range(len(bag_sentence)):
+    print(j)
+    for i in range(len(bag_sentence[j])):
+        bag_sentence[j][i] = re.sub(r'\[[0-9]*\]',' ',bag_sentence[j][i])
+        bag_sentence[j][i] = bag_sentence[j][i].lower()
+        bag_sentence[j][i] = re.sub(r'\d',' ',bag_sentence[j][i])
+        bag_sentence[j][i] = re.sub(r'^b\s+', '', bag_sentence[j][i])
+        bag_sentence[j][i] = re.sub(r'\s+[a-z]\s+', ' ',bag_sentence[j][i])
+        bag_sentence[j][i] = re.sub(r'[@#.,/[/]=/</>/-:$/(/)]',' ', bag_sentence[j][i])
+        bag_sentence[j][i] = re.sub(r'[^\w]', ' ', bag_sentence[j][i])
+        bag_sentence[j][i] = re.sub(r'\s+',' ',bag_sentence[j][i])
+    
 
 
 
