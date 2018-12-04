@@ -11,7 +11,6 @@ import re
 import nltk
 df  = pd.read_csv('cik_list.csv')
 valid_df = df.iloc[:152,:].values
-ur = valid_df[0][5]
 
 for i in range(152):
     valid_df[i][5]="https://www.sec.gov/Archives/"+valid_df[i][5]
@@ -19,9 +18,8 @@ for i in range(152):
 full_data=[]
 
 
-for i in range(2):
+for i in range(152):
     url=valid_df[i][5]
-    #print(url)
     page = urllib.request.urlopen(url)
     soup = BeautifulSoup(page,'html.parser')
     name_box = str(soup.find)
@@ -32,6 +30,7 @@ bag_sentence = []
 for file in full_data:
         sentence = nltk.sent_tokenize(file)
         bag_sentence.append(sentence)
+
 
 
 
