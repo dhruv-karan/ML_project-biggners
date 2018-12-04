@@ -15,49 +15,23 @@ ur = valid_df[0][5]
 
 for i in range(152):
     valid_df[i][5]="https://www.sec.gov/Archives/"+valid_df[i][5]
-    print(valid_df[0][5])
 
 full_data=[]
 
-for i in range(152):
+
+for i in range(2):
     url=valid_df[i][5]
     #print(url)
     page = urllib.request.urlopen(url)
     soup = BeautifulSoup(page,'html.parser')
-    name_box = soup.find
-    full_data.append(name_box) 
-
+    name_box = str(soup.find)
+    full_data.append(name_box)
 
 bag_sentence = []
 
 for file in full_data:
-    if(type(file) == 'str'or'object'):
-        print(file)
         sentence = nltk.sent_tokenize(file)
         bag_sentence.append(sentence)
-    else:
-        pass
-
-one = full_data[0]
-
-nltk.sent_tokenize(one)
-
-
-nam =  'my name.is dhruv karan'
-sentences = nltk.sent_tokenize(nam)
-
-sentences = [nltk.word_tokenize(sentence) for sentence in sentences]
-
-
-j=nam.str.split(pat = '.')
-
-type(one)
-
-
-
-
-
-
 
 
 
