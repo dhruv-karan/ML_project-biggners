@@ -49,13 +49,19 @@ for j in range(len(bag_sentence)):
     
     
 bag_words = []
+
 for sentences in bag_sentence:
     words = [nltk.word_tokenize(sentence) for sentence in sentences]
     bag_words.append(words)
 
-for i in range(len(sentences)):
-    sentences[i] = [word for word in sentences[i] if word not in stopwords.words('english')]
-    
+
+bag_stopwords =[]
+
+for p in range(len(bag_words)):
+    for b in range(len(bag_words[p])):
+        bag_words[p][b] = [word for word in bag_words[p][b] if word not in stopwords.words('english')]
+
+
 
 
 
