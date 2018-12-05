@@ -9,8 +9,11 @@ from bs4 import BeautifulSoup
 from time import sleep
 import re
 import nltk
+from nltk.corpus import stopwords
+
 df  = pd.read_csv('cik_list.csv')
 valid_df = df.iloc[:152,:].values
+
 
 for i in range(152):
     valid_df[i][5]="https://www.sec.gov/Archives/"+valid_df[i][5]
@@ -18,7 +21,7 @@ for i in range(152):
 full_data=[]
 
 
-for i in range(152):
+for i in range(5):
     url=valid_df[i][5]
     page = urllib.request.urlopen(url)
     soup = BeautifulSoup(page,'html.parser')
@@ -43,6 +46,15 @@ for j in range(len(bag_sentence)):
         bag_sentence[j][i] = re.sub(r'[@#.,/[/]=/</>/-:$/(/)]',' ', bag_sentence[j][i])
         bag_sentence[j][i] = re.sub(r'[^\w]', ' ', bag_sentence[j][i])
         bag_sentence[j][i] = re.sub(r'\s+',' ',bag_sentence[j][i])
+    
+    
+bag_words = []
+for sentences in bag_sentence:
+    words = [nltk.word_tokenize(sentence) for sentence in sentences]
+    bag_words.append(words)
+
+for i in range(len(sentences)):
+    sentences[i] = [word for word in sentences[i] if word not in stopwords.words('english')]
     
 
 
