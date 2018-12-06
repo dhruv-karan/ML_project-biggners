@@ -8,11 +8,10 @@ import csv
 from bs4 import BeautifulSoup
 from time import sleep
 import re
-import nltk
-from nltk.corpus import stopwords
 
 df  = pd.read_csv('cik_list.csv')
 valid_df = df.iloc[:152,:].values
+
 
 
 for i in range(152):
@@ -30,9 +29,9 @@ for i in range(5):
 
 bag_sentence = []
 
-for file in full_data:
-        sentence = nltk.sent_tokenize(file)
-        bag_sentence.append(sentence)
+#for file in full_data:
+ #       sentence = nltk.sent_tokenize(file)
+  #      bag_sentence.append(sentence)
 j=0
 i =0
 for j in range(len(bag_sentence)):
@@ -50,16 +49,16 @@ for j in range(len(bag_sentence)):
     
 bag_words = []
 
-for sentences in bag_sentence:
-    words = [nltk.word_tokenize(sentence) for sentence in sentences]
-    bag_words.append(words)
+#for sentences in bag_sentence:
+ #   words = [nltk.word_tokenize(sentence) for sentence in sentences]
+  #  bag_words.append(words)
 
 
 bag_stopwords =[]
 
-for p in range(len(bag_words)):
-    for b in range(len(bag_words[p])):
-        bag_words[p][b] = [word for word in bag_words[p][b] if word not in stopwords.words('english')]
+#for p in range(len(bag_words)):
+ #   for b in range(len(bag_words[p])):
+  #      bag_words[p][b] = [word for word in bag_words[p][b] if word not in stopwords.words('english')]
 
 
 
