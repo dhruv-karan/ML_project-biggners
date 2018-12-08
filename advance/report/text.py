@@ -8,10 +8,26 @@ import csv
 from bs4 import BeautifulSoup
 from time import sleep
 import re
+import nltk
 
 df  = pd.read_csv('cik_list.csv')
 valid_df = df.iloc[:152,:].values
-
+df1 = pd.read_csv('resources/sw/StopWords_Auditor.txt', header=None )
+#df2 = pd.read_csv('resources/sw/StopWords_Currencies.txt', header=None,delimiter="|")
+df3 = pd.read_csv('resources/sw/StopWords_DatesandNumbers.txt', header=None )
+df4 = pd.read_csv('resources/sw/StopWords_Generic.txt', header=None )
+df5 = pd.read_csv('resources/sw/StopWords_GenericLong.txt', header=None )
+df6 = pd.read_csv('resources/sw/StopWords_Geographic.txt', header=None )
+df7 = pd.read_csv('resources/sw/StopWords_Names.txt', header=None )
+resource=[]
+resource.append(df1)
+resource.append(df3)
+resource.append(df4)
+resource.append(df5)
+resource.append(df6)
+resource.append(df7)
+for i in resource:
+    print(i)
 
 
 for i in range(152):
@@ -20,7 +36,7 @@ for i in range(152):
 full_data=[]
 
 
-for i in range(5):
+for i in range(3):
     url=valid_df[i][5]
     page = urllib.request.urlopen(url)
     soup = BeautifulSoup(page,'html.parser')
@@ -29,9 +45,9 @@ for i in range(5):
 
 bag_sentence = []
 
-#for file in full_data:
- #       sentence = nltk.sent_tokenize(file)
-  #      bag_sentence.append(sentence)
+for file in full_data:
+    sentence = nltk.sent_tokenize(file)
+    bag_sentence.append(sentence)
 j=0
 i =0
 for j in range(len(bag_sentence)):
@@ -49,16 +65,16 @@ for j in range(len(bag_sentence)):
     
 bag_words = []
 
-#for sentences in bag_sentence:
- #   words = [nltk.word_tokenize(sentence) for sentence in sentences]
-  #  bag_words.append(words)
+for sentences in bag_sentence:
+    words = [nltk.word_tokenize(sentence) for sentence in sentences]
+    bag_words.append(words)
 
 
 bag_stopwords =[]
 
-#for p in range(len(bag_words)):
- #   for b in range(len(bag_words[p])):
-  #      bag_words[p][b] = [word for word in bag_words[p][b] if word not in stopwords.words('english')]
+for p in range(len(bag_words)):
+    for b in range(len(bag_words[p])):
+        bag_words[p][b] = [word for word in bag_words[p][b] if word not in stopwords.words('english')]
 
 
 
