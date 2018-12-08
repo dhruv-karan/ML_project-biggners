@@ -19,15 +19,27 @@ df4 = pd.read_csv('resources/sw/StopWords_Generic.txt', header=None )
 df5 = pd.read_csv('resources/sw/StopWords_GenericLong.txt', header=None )
 df6 = pd.read_csv('resources/sw/StopWords_Geographic.txt', header=None )
 df7 = pd.read_csv('resources/sw/StopWords_Names.txt', header=None )
-resource=[]
+
+resource = []
+stopwords =[]
 resource.append(df1)
 resource.append(df3)
 resource.append(df4)
 resource.append(df5)
 resource.append(df6)
 resource.append(df7)
+
 for i in resource:
-    print(i)
+    li = list(i.iloc[:,:].values)
+    for ln in li:
+        inter = ln.tolist()
+        stopwords.append(inter[0])
+        #print(type(ln))
+lower_stopwords =[]
+for stop in stopwords:
+    if(type(stop)==str):
+        s = stop
+        lower_stopwords.append(s.lower())
 
 
 for i in range(152):
@@ -51,7 +63,6 @@ for file in full_data:
 j=0
 i =0
 for j in range(len(bag_sentence)):
-    print(j)
     for i in range(len(bag_sentence[j])):
         bag_sentence[j][i] = re.sub(r'\[[0-9]*\]',' ',bag_sentence[j][i])
         bag_sentence[j][i] = bag_sentence[j][i].lower()
@@ -62,7 +73,11 @@ for j in range(len(bag_sentence)):
         bag_sentence[j][i] = re.sub(r'[^\w]', ' ', bag_sentence[j][i])
         bag_sentence[j][i] = re.sub(r'\s+',' ',bag_sentence[j][i])
     
-    
+
+
+
+
+  
 bag_words = []
 
 for sentences in bag_sentence:
@@ -74,7 +89,21 @@ bag_stopwords =[]
 
 for p in range(len(bag_words)):
     for b in range(len(bag_words[p])):
-        bag_words[p][b] = [word for word in bag_words[p][b] if word not in stopwords.words('english')]
+        for st in lower_stopwords:
+            for words in bag_words[p][b]:
+                if(words ==st):
+                    if(st):
+                        print(words)
+                        bag_words[p][b].remove(words)
+                    else:
+                        pass
+                else:
+                    pass
+
+
+
+
+
 
 
 
