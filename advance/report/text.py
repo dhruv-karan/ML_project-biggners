@@ -2,11 +2,9 @@
 
 import pandas as pd
 import numpy as np
-from urllib.request import urlopen
 import urllib.request
 import csv
 from bs4 import BeautifulSoup
-from time import sleep
 import re
 import nltk
 
@@ -122,38 +120,33 @@ for p in range(len(bag_words)):
                         bag_words[p][b].remove(words)
                     else:
                         pass
-                    
                 else:
                     pass
-
-    
-
-
-
-
-
-
-
-
-
-
+  
+pos_list = [[]]
+for aa in range(len(bag_words)):
+    for bb in range(len(bag_words[aa])):
+        count = 0
+        for posw in positive:
+            for cc in bag_words[aa][bb]:
+                if(cc == posw):
+                    count +=count
+                    
 
 
 
-
-
-
+                
+                
+     
 
 
 
 
-
-
-
-
-
-
-
+           
+                
+                
+                
+                
 with open('myfile1.txt', 'w+') as f:
 
     the_text = str(name_box)
