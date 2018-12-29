@@ -157,6 +157,12 @@ res = stats.probplot(df_train[df_train['TotalBsmtSF']>0]['TotalBsmtSF'], plot=pl
 #scatter plot
 plt.scatter(df_train['GrLivArea'], df_train['SalePrice'])
 
+#scatter plot
+plt.scatter(df_train[df_train['TotalBsmtSF']>0]['TotalBsmtSF'], df_train[df_train['TotalBsmtSF']>0]['SalePrice']);
+
+#convert categorical variable into dummy
+
+df_train = pd.get_dummies(df_train)
 
 
 
