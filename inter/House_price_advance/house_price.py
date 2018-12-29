@@ -217,6 +217,20 @@ df_train = pd.get_dummies(df_train)
 df_test = pd.get_dummies(df_test)
 
 
+df_train.columns
+
+# making test set
+X = df_train.iloc[: , : -1].values
+y = df_train.iloc[: , -1].values
+
+
+# making regreser
+from sklearn.ensemble import RandomForestRegressor
+regressor = RandomForestRegressor(n_estimators =300 , random_state=0)
+regressor.fit(X,y)
+
+y_pred = regressor.predict(df_test)
+
 
 
 
