@@ -104,10 +104,58 @@ df_train = df_train.drop(df_train[df_train['Id'] == 441].index)
 # delete 3 points for same reason
 
 
+#histogram and normal probability plot
+sns.distplot(df_train['SalePrice'], fit=norm);
+fig = plt.figure()
+res = stats.probplot(df_train['SalePrice'], plot=plt)
 
+#doing normallisation
 
+#applying log transformation
+df_train['SalePrice'] = np.log(df_train['SalePrice'])
+#transformed histogram and normal probability plot
+sns.distplot(df_train['SalePrice'], fit=norm);
+fig = plt.figure()
+res = stats.probplot(df_train['SalePrice'], plot=plt)
 
+# for parametres
 
+#histogram and normal probability plot
+sns.distplot(df_train['GrLivArea'], fit=norm);
+fig = plt.figure()
+res = stats.probplot(df_train['GrLivArea'], plot=plt)
+
+# ffixing it using log transformation
+#data transformation
+df_train['GrLivArea'] = np.log(df_train['GrLivArea'])
+#transformed histogram and normal probability plot
+sns.distplot(df_train['GrLivArea'], fit=norm);
+fig = plt.figure()
+res = stats.probplot(df_train['GrLivArea'], plot=plt)
+
+#histogram and normal probability plot
+sns.distplot(df_train['TotalBsmtSF'], fit=norm);
+fig = plt.figure()
+res = stats.probplot(df_train['TotalBsmtSF'], plot=plt)
+
+# performing normalistion i.e taking log but some house have 0 basement which gives erroer with log
+# hence we are taking  log with removel of O
+
+#create column for new variable (one is enough because it's a binary categorical feature)
+#if area>0 it gets 1, for area==0 it gets 0
+df_train['HasBsmt'] = pd.Series(len(df_train['TotalBsmtSF']), index=df_train.index)
+df_train['HasBsmt'] = 0 
+df_train.loc[df_train['TotalBsmtSF']>0,'HasBsmt'] = 1
+#transform data
+df_train.loc[df_train['HasBsmt']==1,'TotalBsmtSF'] = np.log(df_train['TotalBsmtSF'])
+#histogram and normal probability plot
+sns.distplot(df_train[df_train['TotalBsmtSF']>0]['TotalBsmtSF'], fit=norm);
+fig = plt.figure()
+res = stats.probplot(df_train[df_train['TotalBsmtSF']>0]['TotalBsmtSF'], plot=plt)
+
+#search for  'homoscedasticity' 
+#scatter plot
+plt.scatter(df_train['GrLivArea'], df_train['SalePrice'])
 
 
 
