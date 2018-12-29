@@ -11,9 +11,12 @@ warnings.filterwarnings('ignore')
 
 #bring in the six packs
 df_train = pd.read_csv('train.csv')
+df_test = pd.read_csv('test.csv')
 
 df_train.columns
+
 l =df_train.isnull().sum()
+l1 = df_test.isnull().sum()
 
 df_train['SalePrice'].describe()
 
@@ -53,22 +56,35 @@ corrmat = df_train.corr()
 f, ax = plt.subplots(figsize=(12, 9))
 sns.heatmap(corrmat, vmax=.8, square=True)
 
+
 #scatterplot
 sns.set()
 cols = ['SalePrice', 'OverallQual', 'GrLivArea', 'GarageCars', 'TotalBsmtSF', 'FullBath', 'YearBuilt']
 sns.pairplot(df_train[cols], size = 2.5)
 plt.show()
 
-#missing data
+#missing data train
 total = df_train.isnull().sum().sort_values(ascending=False)
 percent = (df_train.isnull().sum()/df_train.isnull().count()).sort_values(ascending=False)
 missing_data = pd.concat([total, percent], axis=1, keys=['Total', 'Percent'])
 missing_data.head(20)
 
-#dealing with missing data
+#missing data test
+total = df_test.isnull().sum().sort_values(ascending=False)
+percent = (df_test.isnull().sum()/df_test.isnull().count()).sort_values(ascending=False)
+missing_data = pd.concat([total, percent], axis=1, keys=['Total', 'Percent'])
+missing_data.head(20)
+
+
+#dealing with training missing data
 df_train = df_train.drop((missing_data[missing_data['Total'] > 1]).index,1)
 df_train = df_train.drop(df_train.loc[df_train['Electrical'].isnull()].index)
 df_train.isnull().sum().max() #just checking that
+
+#dealing with test missing data
+df_test = df_test.drop((missing_data[missing_data['Total'] >= 1]).index,1)
+df_test = df_test.drop(df_test.loc[df_test['BsmtHalfBath'].isnull()].index)
+df_test.isnull().sum().max() #just checking that
 
 #standardizing data
 saleprice_scaled = StandardScaler().fit_transform(df_train['SalePrice'][:,np.newaxis]);
@@ -85,6 +101,14 @@ var = 'GrLivArea'
 data = pd.concat([df_train['SalePrice'], df_train[var]], axis=1)
 data.plot.scatter(x=var, y='SalePrice', ylim=(0,800000));
 #the 2 low price points are not representative of the typical case. Therefore, we'll define them as outliers and delete them.
+
+#bivariate test  analysis saleprice/grlivarea
+# no need for doing this
+var = 'GrLivArea'
+data = pd.concat([df_train['SalePrice'], df_test[var]], axis=1)
+data.plot.scatter(x=var, y='SalePrice', ylim=(0,800000));
+#the 2 low price points are not representative of the typical case. Therefore, we'll define them as outliers and delete them.
+
 
 #deleting points
 df_train.sort_values(by = 'GrLivArea', ascending = False)[:2]
@@ -105,36 +129,47 @@ df_train = df_train.drop(df_train[df_train['Id'] == 441].index)
 
 
 #histogram and normal probability plot
-sns.distplot(df_train['SalePrice'], fit=norm);
+sns.distplot(df_train['SalePrice'], fit=norm)
 fig = plt.figure()
 res = stats.probplot(df_train['SalePrice'], plot=plt)
 
-#doing normallisation
+#=============================================doing normallisation ======================================================
 
 #applying log transformation
 df_train['SalePrice'] = np.log(df_train['SalePrice'])
+
 #transformed histogram and normal probability plot
-sns.distplot(df_train['SalePrice'], fit=norm);
+sns.distplot(df_train['SalePrice'], fit=norm)
 fig = plt.figure()
 res = stats.probplot(df_train['SalePrice'], plot=plt)
 
 # for parametres
 
 #histogram and normal probability plot
-sns.distplot(df_train['GrLivArea'], fit=norm);
+sns.distplot(df_train['GrLivArea'], fit=norm)
 fig = plt.figure()
 res = stats.probplot(df_train['GrLivArea'], plot=plt)
 
 # ffixing it using log transformation
-#data transformation
+
+#train_data normalisation transformation
 df_train['GrLivArea'] = np.log(df_train['GrLivArea'])
-#transformed histogram and normal probability plot
-sns.distplot(df_train['GrLivArea'], fit=norm);
+
+#transformed training_data histogram and normal probability plot
+sns.distplot(df_train['GrLivArea'], fit=norm)
 fig = plt.figure()
 res = stats.probplot(df_train['GrLivArea'], plot=plt)
 
+#test data normalisation transformation
+df_test['GrLivArea'] = np.log(df_test['GrLivArea'])
+#transformed test_data histogram and normal probability plot
+sns.distplot(df_test['GrLivArea'], fit=norm)
+fig = plt.figure()
+res = stats.probplot(df_test['GrLivArea'], plot=plt)
+
+
 #histogram and normal probability plot
-sns.distplot(df_train['TotalBsmtSF'], fit=norm);
+sns.distplot(df_train['TotalBsmtSF'], fit=norm)
 fig = plt.figure()
 res = stats.probplot(df_train['TotalBsmtSF'], plot=plt)
 
@@ -143,26 +178,46 @@ res = stats.probplot(df_train['TotalBsmtSF'], plot=plt)
 
 #create column for new variable (one is enough because it's a binary categorical feature)
 #if area>0 it gets 1, for area==0 it gets 0
+# training data
 df_train['HasBsmt'] = pd.Series(len(df_train['TotalBsmtSF']), index=df_train.index)
 df_train['HasBsmt'] = 0 
 df_train.loc[df_train['TotalBsmtSF']>0,'HasBsmt'] = 1
 #transform data
 df_train.loc[df_train['HasBsmt']==1,'TotalBsmtSF'] = np.log(df_train['TotalBsmtSF'])
+
 #histogram and normal probability plot
 sns.distplot(df_train[df_train['TotalBsmtSF']>0]['TotalBsmtSF'], fit=norm);
 fig = plt.figure()
 res = stats.probplot(df_train[df_train['TotalBsmtSF']>0]['TotalBsmtSF'], plot=plt)
+
+#test data
+df_test['HasBsmt'] = pd.Series(len(df_test['TotalBsmtSF']), index=df_test.index)
+df_test['HasBsmt'] = 0 
+df_test.loc[df_test['TotalBsmtSF']>0,'HasBsmt'] = 1
+#transform data
+df_test.loc[df_test['HasBsmt']==1,'TotalBsmtSF'] = np.log(df_test['TotalBsmtSF'])
+
+#histogram and normal probability plot
+sns.distplot(df_test[df_test['TotalBsmtSF']>0]['TotalBsmtSF'], fit=norm)
+fig = plt.figure()
+res = stats.probplot(df_test[df_test['TotalBsmtSF']>0]['TotalBsmtSF'], plot=plt)
+
 
 #search for  'homoscedasticity' 
 #scatter plot
 plt.scatter(df_train['GrLivArea'], df_train['SalePrice'])
 
 #scatter plot
-plt.scatter(df_train[df_train['TotalBsmtSF']>0]['TotalBsmtSF'], df_train[df_train['TotalBsmtSF']>0]['SalePrice']);
+plt.scatter(df_train[df_train['TotalBsmtSF']>0]['TotalBsmtSF'], df_train[df_train['TotalBsmtSF']>0]['SalePrice'])
 
 #convert categorical variable into dummy
 
 df_train = pd.get_dummies(df_train)
+
+df_test = pd.get_dummies(df_test)
+
+
+
 
 
 
