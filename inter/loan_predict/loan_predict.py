@@ -16,7 +16,9 @@ warnings.filterwarnings('ignore')
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Training data
+# Training data("for data related plz refer kaggle this competion 
+# link ="https://www.kaggle.com/c/home-credit-default-risk"
+# " )
 df_train = pd.read_csv('../input/application_train.csv')
 print('Training data shape: ', df_train.shape)
 df_train.head()
