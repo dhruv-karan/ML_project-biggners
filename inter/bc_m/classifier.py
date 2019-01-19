@@ -31,3 +31,20 @@ pipe_lr = Pipeline([('scl', StandardScaler()),('pca',PCA(n_components =2)),
 
 pipe_lr.fit(X_train,y_train)
 print(pipe_lr.score(X_test,y_test ))
+
+#================= Validation ==================
+from sklearn.cross_validation import StratifiedKFold
+kfold = StratifiedKFold(y = y_train,n_folds=10,random_state=1)
+
+scores = []
+
+for k,(train,test) in enumerate(kfold):
+    pipe_lr.fit(X_train[train],y_train[train])
+    score = pipe_lr.score(X_train[test],y_train[test])
+    scores.append(score)
+    print('Fold: %s, Class dist.: %s, Acc: %.3f' % (k+1,np.bincount(y_train[train]), score))
+
+np.mean(scores)
+np.std(scores)
+
+
