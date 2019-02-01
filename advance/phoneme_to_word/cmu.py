@@ -6,12 +6,14 @@ import numpy as np
 
 import pandas as pd
 
-df= pd.read_csv('phoneme_to_word/cmudict.csv')
-
+df= pd.read_csv('cmudict.csv')
 df.isnull().sum()
 df.dropna(inplace=True)
 df.columns
 df.head(3)
+row,columb=df.shape
+
+df = df.sample(n= int(row/8))
 
 word = df['word']
 pronunciation = df['pronunciation']
@@ -112,24 +114,19 @@ phone_seq_matrix_decoder_output = np.pad(phone_seq_matrix,((0,0),(0,1),(0,0)), m
 
 
 
-
-
-
-
-
 from keras.models import Model
 from keras.layers import Input, LSTM, Dense
 
 def baseline_model(hidden_nodes = 256):
     
     # Shared Components - Encoder
-    char_inputs = Input(shape=(None, CHAR_TOKEN_COUNT))
+    char_inputs = Input(shape=(None,30 ))
     encoder = LSTM(hidden_nodes, return_state=True)
     
     # Shared Components - Decoder
-    phone_inputs = Input(shape=(None, PHONE_TOKEN_COUNT))
+    phone_inputs = Input(shape=(None,72 ))
     decoder = LSTM(hidden_nodes, return_sequences=True, return_state=True)
-    decoder_dense = Dense(PHONE_TOKEN_COUNT, activation='softmax')
+    decoder_dense = Dense(72, activation='softmax')
     
     # Training Model
     _, state_h, state_c = encoder(char_inputs) # notice encoder outputs are ignored
@@ -155,6 +152,7 @@ def baseline_model(hidden_nodes = 256):
     return training_model, testing_encoder_model, testing_decoder_model
 
 
+
 from sklearn.model_selection import train_test_split
 
 TEST_SIZE = 0.2
@@ -163,34 +161,41 @@ TEST_SIZE = 0.2
  phone_input_train, phone_input_test, 
  phone_output_train, phone_output_test) = train_test_split(
     char_seq_matrix, phone_seq_matrix, phone_seq_matrix_decoder_output, 
-    test_size=TEST_SIZE, random_state=42)
+    test_size=TEST_SIZE, random_state=0)
 
 TEST_EXAMPLE_COUNT = char_input_test.shape[0]
 
-from keras.callbacks import ModelCheckpoint, EarlyStopping
 
-def train(model, weights_path, encoder_input, decoder_input, decoder_output):
-    checkpointer = ModelCheckpoint(filepath=weights_path, verbose=1, save_best_only=True)
-    stopper = EarlyStopping(monitor='val_loss',patience=3)
-    
+
+def train(model, encoder_input, decoder_input, decoder_output):    
     model.compile(optimizer='adam', loss='categorical_crossentropy')
     model.fit([encoder_input, decoder_input], decoder_output,
           batch_size=256,
-          epochs=100,
-          validation_split=0.2, # Keras will automatically create a validation set for us
-          callbacks=[checkpointer, stopper])
+          epochs=10,
+          validation_split=0.2 )# Keras will automatically create a validation set for us
+
     
-BASELINE_MODEL_WEIGHTS = os.path.join(
-    '../input', 'predicting-english-pronunciations-model-weights', 'baseline_model_weights.hdf5')
 training_model, testing_encoder_model, testing_decoder_model = baseline_model()
-if not IS_KAGGLE:
-    train(training_model, BASELINE_MODEL_WEIGHTS, char_input_train, phone_input_train, phone_output_train)
+train(training_model, char_input_train, phone_input_train, phone_output_train)
+
+               
+
+
+
+
+
+
+
+
+
+
+#================================================================== Ignore right now
 
 def predict_baseline(input_char_seq, encoder, decoder):
     state_vectors = encoder.predict(input_char_seq) 
     
     prev_phone = np.zeros((1, 1, PHONE_TOKEN_COUNT))
-    prev_phone[0, 0, phone_to_id[START_PHONE_SYM]] = 1.
+    prev_phone[0, 0, phoe_to_id[START_PHONE_SYM]] = 1.
     
     end_found = False 
     pronunciation = '' 
@@ -199,7 +204,7 @@ def predict_baseline(input_char_seq, encoder, decoder):
         
         # Predict the phoneme with the highest probability
         predicted_phone_idx = np.argmax(decoder_output[0, -1, :])
-        predicted_phone = id_to_phone[predicted_phone_idx]
+        predicted_phone = id_to_phoe[predicted_phone_idx]
         
         pronunciation += predicted_phone + ' '
         
@@ -219,11 +224,11 @@ def one_hot_matrix_to_word(char_seq):
         if np.count_nonzero(char_vec) == 0:
             break
         hot_bit_idx = np.argmax(char_vec)
-        char = id_to_char[hot_bit_idx]
+        char = id_to_cha[hot_bit_idx]
         word += char
     return word
 
-
+==============================
 # Some words have multiple correct pronunciations
 # If a prediction matches any correct pronunciation, consider it correct.
 def is_correct(word,test_pronunciation):
@@ -247,22 +252,3 @@ def sample_baseline_predictions(sample_count, word_decoder):
 training_model.load_weights(BASELINE_MODEL_WEIGHTS)  # also loads weights for testing models
 sample_baseline_predictions(10, one_hot_matrix_to_word)
 
-import math
-
-
-def get_change(m):
-    d = m%10
-    if d==0:
-        return m/10
-    m = math.floor(m/10)
-    if d>5:
-        m = m+ d-5
-        return m
-    d = d%5
-    if d==0:
-        m = m+1
-        return m
-    m = m+d
-    return m
-
-get_change(9)
