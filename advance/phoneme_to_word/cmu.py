@@ -18,6 +18,11 @@ df = df.sample(n= int(row/8))
 word = df['word']
 pronunciation = df['pronunciation']
 
+phonetic_dict = {}
+for i,j in zip(word,pronunciation):
+    if i not in phonetic_dict:
+        phonetic_dict[i] =j
+
 import string
 
 START_PHONE_SYM = '\t'
@@ -178,24 +183,14 @@ def train(model, encoder_input, decoder_input, decoder_output):
 training_model, testing_encoder_model, testing_decoder_model = baseline_model()
 train(training_model, char_input_train, phone_input_train, phone_output_train)
 
-               
 
 
-
-
-
-
-
-
-
-
-#================================================================== Ignore right now
 
 def predict_baseline(input_char_seq, encoder, decoder):
     state_vectors = encoder.predict(input_char_seq) 
     
     prev_phone = np.zeros((1, 1, PHONE_TOKEN_COUNT))
-    prev_phone[0, 0, phoe_to_id[START_PHONE_SYM]] = 1.
+    prev_phone[0, 0, phoe_to_id[START_PHONE_SYM]] = 1
     
     end_found = False 
     pronunciation = '' 
@@ -228,15 +223,19 @@ def one_hot_matrix_to_word(char_seq):
         word += char
     return word
 
-==============================
+id_to_cha[3]
+
 # Some words have multiple correct pronunciations
 # If a prediction matches any correct pronunciation, consider it correct.
 def is_correct(word,test_pronunciation):
-    correct_pronuns = phonetic_dict[word]
-    for correct_pronun in correct_pronuns:
-        if test_pronunciation == correct_pronun:
-            return True
-    return False
+    if word not in phonetic_dict:
+        pass
+    else:
+        correct_pronuns = phonetic_dict[word]
+        for correct_pronun in correct_pronuns:
+            if test_pronunciation == correct_pronun:
+                return True
+            return False
 
 
 def sample_baseline_predictions(sample_count, word_decoder):
@@ -246,9 +245,13 @@ def sample_baseline_predictions(sample_count, word_decoder):
         predicted_pronun = predict_baseline(example_char_seq, testing_encoder_model, testing_decoder_model)
         example_word = word_decoder(example_char_seq)
         pred_is_correct = is_correct(example_word, predicted_pronun)
-        print('✅ ' if pred_is_correct else '❌ ', example_word,'-->', predicted_pronun)
+        print('❌ ' if pred_is_correct else ' ✅', example_word,'-->', predicted_pronun)
 
 
-training_model.load_weights(BASELINE_MODEL_WEIGHTS)  # also loads weights for testing models
-sample_baseline_predictions(10, one_hot_matrix_to_word)
+sample_baseline_predictions(100, one_hot_matrix_to_word)
+
+
+
+
+
 
